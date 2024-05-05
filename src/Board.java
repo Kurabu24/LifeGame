@@ -1,30 +1,37 @@
 import java.util.ArrayList;
 
 public class Board {
-    int[][] board = new int[30][30];
-    int[][] nextBoard = new int[30][30];
+    int gridSize;
+    int[][] board;
+    int[][] nextBoard;
     ArrayList<Position> cells = new ArrayList<Position>();
 
-    public void refresh() {
-        for (int i = 0; i < 30; i++) {
-            for (int j = 0; j < 30; j++) {
-                if (this.board[i][j] == 1) {
+    public Board(int gridSize) {
+        this.gridSize = gridSize;
+        this.board = new int[gridSize][gridSize];
+        this.nextBoard = new int[gridSize][gridSize];
+    }
+
+    private void refresh() {
+        for (int i = 0; i < gridSize; i++) {
+            for (int j = 0; j < gridSize; j++) {
+                if (this.isAlive(new Position(i, j))) {
                     this.cells.add(new Position(i, j));
                 }
             }
         }
     }
 
-    public void reset() {
+    private void reset() {
         this.cells.clear();
-        for (int i = 0; i < 30; i++) {
-            for (int j = 0; j < 30; j++) {
+        for (int i = 0; i < gridSize; i++) {
+            for (int j = 0; j < gridSize; j++) {
                 this.nextBoard[i][j] = 0;
             }
         }
     }
 
-    public void add(Position p) {
+    private void add(Position p) {
         int x = p.x;
         int y = p.y;
         this.nextBoard[x][y] = 1;
@@ -50,8 +57,8 @@ public class Board {
 
     public String toString() {
         String result = "";
-        for (int i = 0; i < 30; i++) {
-            for (int j = 0; j < 30; j++) {
+        for (int i = 0; i < gridSize; i++) {
+            for (int j = 0; j < gridSize; j++) {
                 if (!this.isAlive(new Position(i, j))) {
                     result += "☐";
                 } else {
@@ -64,117 +71,18 @@ public class Board {
         return result;
     }
 
-    private int AliveArround(Position p) {
+    private int aliveArround(Position p) {
         int x = p.x;
         int y = p.y;
         int aliveCount = 0;
-        if (x == 0) {
-            if (y == 0) {
-                if (this.isAlive(new Position(x, y + 1))) {
-                    aliveCount++;
-                }
-                if (this.isAlive(new Position(x + 1, y + 1))) {
-                    aliveCount++;
-                }
-                if (this.isAlive(new Position(x + 1, y))) {
-                    aliveCount++;
-                }
-            } else if (y == 29) {
-                if (this.isAlive(new Position(x, y - 1))) {
-                    aliveCount++;
-                }
-                if (this.isAlive(new Position(x + 1, y - 1))) {
-                    aliveCount++;
-                }
-                if (this.isAlive(new Position(x + 1, y))) {
-                    aliveCount++;
-                }
-            } else {
-                for (int i = 0; i < 3; i++) {
-                    if (this.isAlive(new Position(x + 1, y - 1 + i))) {
+        for (int i = x - 1; i < x + 2; i++) {
+            for (int j = y - 1; j < y + 2; j++) {
+                if ((i > 0 && i < gridSize) && (j > 0 && j < gridSize)) {
+                    if (i == x && j == y) {
+
+                    } else if (this.isAlive(new Position(i, j))) {
                         aliveCount++;
                     }
-                }
-                if (this.isAlive(new Position(x, y + 1))) {
-                    aliveCount++;
-                }
-                if (this.isAlive(new Position(x, y - 1))) {
-                    aliveCount++;
-                }
-            }
-        } else if (x == 29) {
-            if (y == 0) {
-                if (this.isAlive(new Position(x, y + 1))) {
-                    aliveCount++;
-                }
-                if (this.isAlive(new Position(x - 1, y + 1))) {
-                    aliveCount++;
-                }
-                if (this.isAlive(new Position(x - 1, y))) {
-                    aliveCount++;
-                }
-            } else if (y == 29) {
-                if (this.isAlive(new Position(x, y - 1))) {
-                    aliveCount++;
-                }
-                if (this.isAlive(new Position(x - 1, y - 1))) {
-                    aliveCount++;
-                }
-                if (this.isAlive(new Position(x - 1, y))) {
-                    aliveCount++;
-                }
-            } else {
-                for (int i = 0; i < 3; i++) {
-                    if (this.isAlive(new Position(x - 1, y - 1 + i))) {
-                        aliveCount++;
-                    }
-                }
-                if (this.isAlive(new Position(x, y + 1))) {
-                    aliveCount++;
-                }
-                if (this.isAlive(new Position(x, y - 1))) {
-                    aliveCount++;
-                }
-            }
-        } else {
-            if (y == 0) {
-                if (this.isAlive(new Position(x - 1, y))) {
-                    aliveCount++;
-                }
-                if (this.isAlive(new Position(x + 1, y))) {
-                    aliveCount++;
-                }
-                for (int j = 0; j < 3; j++) {
-                    if (this.isAlive(new Position(x - 1 + j, y + 1))) {
-                        aliveCount++;
-                    }
-                }
-            } else if (y == 29) {
-                if (this.isAlive(new Position(x - 1, y))) {
-                    aliveCount++;
-                }
-                if (this.isAlive(new Position(x + 1, y))) {
-                    aliveCount++;
-                }
-                for (int j = 0; j < 3; j++) {
-                    if (this.isAlive(new Position(x - 1 + j, y - 1))) {
-                        aliveCount++;
-                    }
-                }
-            } else {
-                for (int i = 0; i < 3; i++) {
-                    if (this.isAlive(new Position(x - 1, y - 1 + i))) {
-                        aliveCount++;
-                    }
-                    if (this.isAlive(new Position(x + 1, y - 1 + i))) {
-                        aliveCount++;
-                    }
-                }
-                if (this.isAlive(new Position(x, y + 1))) {
-                    aliveCount++;
-                }
-                if (this.isAlive(new Position(x, y - 1))) {
-                    aliveCount++;
                 }
             }
         }
@@ -182,7 +90,7 @@ public class Board {
     }
 
     private void checkLife(Position p) {
-        int aliveCount = this.AliveArround(p);
+        int aliveCount = this.aliveArround(p);
         if (!this.isAlive(p)) {
             if (aliveCount == 3) {
                 this.add(p);
@@ -190,8 +98,7 @@ public class Board {
         } else {
             if (!(aliveCount == 2 || aliveCount == 3)) {
                 this.del(p);
-            }
-            else{
+            } else {
                 this.add(p);
             }
         }
@@ -206,63 +113,20 @@ public class Board {
             int x = cell.x;
             int y = cell.y;
             checkLife(cell);
-            if (x == 0) {
-                if (y == 0) {
-                    this.checkLife(new Position(x, y + 1));
-                    this.checkLife(new Position(x + 1, y + 1));
-                    this.checkLife(new Position(x + 1, y));
-                } else if (y == 29) {
-                    this.checkLife(new Position(x, y - 1));
-                    this.checkLife(new Position(x + 1, y - 1));
-                    this.checkLife(new Position(x + 1, y));
-                } else {
-                    for (int i = 0; i < 3; i++) {
-                        this.checkLife(new Position(x + 1, y - 1 + i));
+            for (int i = x - 1; i <= x + 1; i++) {
+                for (int j = y - 1; j <= y + 1; j++) {
+                    if ((i > 0 && i < gridSize) && (j > 0 && j < gridSize)) {
+                        if (i == x || j == y) {
+
+                        } else {
+                            checkLife(new Position(i, j));
+                        }
                     }
-                    this.checkLife(new Position(x, y + 1));
-                    this.checkLife(new Position(x, y - 1));
-                }
-            } else if (x == 29) {
-                if (y == 0) {
-                    this.checkLife(new Position(x, y + 1));
-                    this.checkLife(new Position(x - 1, y + 1));
-                    this.checkLife(new Position(x - 1, y));
-                } else if (y == 29) {
-                    this.checkLife(new Position(x, y - 1));
-                    this.checkLife(new Position(x - 1, y - 1));
-                    this.checkLife(new Position(x - 1, y));
-                } else {
-                    for (int i = 0; i < 3; i++) {
-                        this.checkLife(new Position(x - 1, y - 1 + i));
-                    }
-                    this.checkLife(new Position(x, y + 1));
-                    this.checkLife(new Position(x, y - 1));
-                }
-            } else {
-                if (y == 0) {
-                    this.checkLife(new Position(x - 1, y));
-                    this.checkLife(new Position(x + 1, y));
-                    for (int j = 0; j < 3; j++) {
-                        this.checkLife(new Position(x - 1 + j, y + 1));
-                    }
-                } else if (y == 29) {
-                    this.checkLife(new Position(x - 1, y));
-                    this.checkLife(new Position(x + 1, y));
-                    for (int j = 0; j < 3; j++) {
-                        this.checkLife(new Position(x - 1 + j, y - 1));
-                    }
-                } else {
-                    for (int i = 0; i < 3; i++) {
-                        this.checkLife(new Position(x - 1, y - 1 + i));
-                        this.checkLife(new Position(x + 1, y - 1 + i));
-                    }
-                    this.checkLife(new Position(x, y + 1));
-                    this.checkLife(new Position(x, y - 1));
                 }
             }
         }
-        for (int i = 0; i < 30; i++) {
-            for (int j = 0; j < 30; j++) {
+        for (int i = 0; i < gridSize; i++) {
+            for (int j = 0; j < gridSize; j++) {
                 this.board[i][j] = this.nextBoard[i][j];
             }
         }
